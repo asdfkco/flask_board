@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect
 import pymysql
 import math
 
-with open("./db.json",'r') as file:
+with open("config/db.json", 'r') as file:
     data = json.load(file)
 
 db = pymysql.connect(host=data["host"],user=data["user"],passwd=data["passwd"],db="free_board",charset="utf8")
