@@ -1,14 +1,15 @@
 import json
 from urllib import request
 
+import requests
 from flask import Flask, render_template, request, redirect, session, make_response, url_for
 import pymysql
 import math
 
-with open("config/db.json", 'r') as file:
-    data = json.load(file)
+with open("config/config.json", 'r') as file:
+    data_json = json.load(file)
 
-db = pymysql.connect(host=data["host"], user=data["user"], passwd=data["passwd"], db="free_board", charset="utf8")
+db = pymysql.connect(host=data_json["host"], user=data_json["user"], passwd=data_json["passwd"], db="free_board", charset="utf8")
 cur = db.cursor()
 app = Flask(__name__)
 app.secret_key = "ex_id"
@@ -136,7 +137,7 @@ def board_login_action():
         print(sql)
         cur.execute(sql)
         data = cur.fetchall()
-        if (len(data) == 1):
+        if len(data) == 1:
             print(data)
             session["id"] = form_id
             return redirect("/")
@@ -144,6 +145,34 @@ def board_login_action():
             return redirect(url_for('board_login', id="fail"))
     else:
         return "잘못된 접근입니다."
+
+@app.route('/CallBack')
+def Naver_Login_CallBack():
+    return
+
+@app.route('/GoogleLogin/')
+def Google_Login():
+    return
+
+@app.route('/GoogleLogin/redirect')
+def Google_Login_Url():
+    Google_code_Data = request.args
+
+    data = {
+        'code':Google_code_Data['code'],
+        'client_id' : data_json['GoogleClientId'],
+        'client_secret' : data_json['GoogleClientPw'],
+        'redirect_uri' : 'http://localhost:5000/GoogleLogin/redirect',
+        'grant_type' : 'authorization_code'
+    }
+    a = requests.put("https://www.googleapis.com/oauth2/v2/userinfo/",json=data)
+    print(a)
+    return a
+# redirect('/GoogleLogin/oauth')
+@app.route('/GoogleLogin/oauth')
+def Google_Login_Oauth():
+    Google_User_Data = request.args
+    return Google_User_Data
 
 
 if __name__ == '__main__':
