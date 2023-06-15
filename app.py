@@ -9,7 +9,8 @@ import math
 with open("config/config.json", 'r') as file:
     data_json = json.load(file)
 
-db = pymysql.connect(host=data_json["host"], user=data_json["user"], passwd=data_json["passwd"], db="free_board", charset="utf8")
+db = pymysql.connect(host=data_json["host"], user=data_json["user"], passwd=data_json["passwd"], db="free_board",
+                     charset="utf8")
 cur = db.cursor()
 app = Flask(__name__)
 app.secret_key = "ex_id"
@@ -146,36 +147,44 @@ def board_login_action():
     else:
         return "잘못된 접근입니다."
 
+
 @app.route('/CallBack')
 def Naver_Login_CallBack():
     return
 
-@app.route('/GoogleLogin/')
+
+@app.route('/GoogleLogin')
 def Google_Login():
-    return
+    return redirect(
+        f'https://accounts.google.com/o/oauth2/v2/auth?client_id={data_json["GoogleClientId"]}&redirect_uri=http://localhost:5000/GoogleLogin/redirect&scope=email profile&response_type=code')
+
 
 @app.route('/GoogleLogin/redirect')
 def Google_Login_Url():
     Google_code_Data = request.args
-
-    data = {
-        'code':Google_code_Data['code'],
-        'client_id' : data_json['GoogleClientId'],
-        'client_secret' : data_json['GoogleClientPw'],
-        'redirect_uri' : 'http://localhost:5000/GoogleLogin/redirect',
-        'grant_type' : 'authorization_code'
-    }
-    a = requests.put("https://www.googleapis.com/oauth2/v2/userinfo/",json=data)
+    a = requests.post(
+        f"https://oauth2.googleapis.com/token?code={Google_code_Data['code']}&client_id={data_json['GoogleClientId']}&client_secret={data_json['GoogleClientPw']}&redirect_uri=http://localhost:5000/GoogleLogin/redirect&grant_type=authorization_code")
+    a = a.json()['access_token']
     print(a)
-    return a
-# redirect('/GoogleLogin/oauth')
+    return redirect(url_for('Google_Login_Oauth', data=a))
+
+
 @app.route('/GoogleLogin/oauth')
 def Google_Login_Oauth():
-    Google_User_Data = request.args
-    return Google_User_Data
+    token = request.args.get('data')
+    Google_User_Data = requests.get(f'https://www.googleapis.com/oauth2/v2/userinfo?access_token={token}')
+    return Google_User_Data.json()
 
 
 if __name__ == '__main__':
     app.jinja_env.auto_reload = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True, port=5000)
+
+# data = {
+#     'code':Google_code_Data['code'],
+#     'client_id' : data_json['GoogleClientId'],
+#     'client_secret' : data_json['GoogleClientPw'],
+#     'redirect_uri' : 'http://localhost:5000/GoogleLogin/redirect',
+#     'grant_type' : 'authorization_code'
+# }
