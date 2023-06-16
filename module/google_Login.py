@@ -3,13 +3,15 @@ from urllib import request
 
 import requests
 from flask import Flask, render_template, request, redirect, session, make_response, url_for, Blueprint
-import pymysql
-import math
 
-bp = Blueprint("GoogleLogin",__name__,url_prefix='/GoogleLogin')
+from .userDAO import User_Data
+
+bp = Blueprint("GoogleLogin", __name__, url_prefix='/GoogleLogin')
 
 with open("./config/config.json", 'r') as file:
     data_json = json.load(file)
+
+
 
 @bp.route('/')
 def Google_Login():
@@ -30,9 +32,13 @@ def Google_Login_Url():
     return redirect(url_for('GoogleLogin.Google_Login_Oauth', data=a))
 
 
+
 @bp.route('/oauth')
 def Google_Login_Oauth():
     token = request.args.get('data')
     Google_User_Data = requests.get(f'https://www.googleapis.com/oauth2/v2/userinfo?access_token={token}')
-    Google_User_Data = Google_User_Data.json()
-    return Google_User_Data
+    Google_User_Data_Set = Google_User_Data
+    call_data = User_Data()
+    call_data.Google_SetData(Google_User_Data_Set.text)
+    return redirect(url_for('user.board_login_action', social='Google'))
+

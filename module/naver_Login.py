@@ -11,6 +11,7 @@ bp = Blueprint("NaverLogin", __name__, url_prefix='/NaverLogin')
 with open("./config/config.json", 'r') as file:
     data_json = json.load(file)
 
+Naver_User_Data = ""
 
 @bp.route('/')
 def Naver_Login():
@@ -38,10 +39,14 @@ def Naver_Login_Oauth():
     token = request.args.get('data')
     Naver_User_Data = requests.get(f'https://openapi.naver.com/v1/nid/me',headers={"Authorization" : f"Bearer {token}"})
     Naver_User_Data = Naver_User_Data.json()
-    return Naver_User_Data
+    return redirect(url_for('user.board_login_action', social='Naver'))
 
 
 @bp.route('/logout')
 def logout():
     requests.post('https://nid.naver.com/oauth2.0/token?grant_type=delete&client_id=jyvqXeaVOVmV&client_secret=527300A0_COq1_XV33cf&access_token=c8ceMEJisO4Se7uGCEYKK1p52L93bHXLnaoETis9YzjfnorlQwEisqemfpKHUq2gY&service_provider=NAVER')
     return redirect('/')
+
+
+def Naver_getData():
+    return Naver_User_Data

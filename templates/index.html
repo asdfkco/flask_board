@@ -12,9 +12,14 @@
 <header class="text-center padding10" style="display: flex; padding: 30px; justify-content: space-between;">
     <h1><a href="/">Chanoks Free Board!</a></h1>
     {% if not session %}
+    <div>
         <a class="btn btn-outline-info float-end" href="/login" style="height: 40px">로그인</a>
+        <a class="btn btn-outline-info float-end" href="/register" style="height: 40px">회원가입</a>
+    </div>
     {% elif session %}
+    <div>
         <a class="btn btn-outline-info float-end" href="/logout" style="height: 40px">로그아웃</a>
+    </div>
     {% endif %}
 
 </header>
