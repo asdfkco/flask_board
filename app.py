@@ -12,6 +12,7 @@ import math
 app = Flask(__name__)
 app.secret_key = "ex_id"
 
+
 app.register_blueprint(google_Login.bp)
 app.register_blueprint(naver_Login.bp)
 app.register_blueprint(user.bp)

@@ -18,11 +18,13 @@ cur = db.cursor()
 
 @bp.route('/')
 def index():
+    print(session.keys())
     return redirect(location="/1")
 
 
 @bp.route('/<int:pages>')
 def index_page(pages):
+    print(session.values())
     sql = f"select * from board where num between {((pages - 1) * 15) + 1 if ((pages - 1) * 15) > 1 else (pages - 1) * 15} and {pages * 15}"
     total_pages = cur.execute("select * from board order by num")
     count = (math.trunc(total_pages / 10) + 1)
