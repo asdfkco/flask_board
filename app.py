@@ -5,8 +5,8 @@ from module import google_Login,naver_Login,user,board
 
 from flask import Flask, render_template, request, redirect, session, make_response, url_for
 import pymysql
-import math
-
+import math,os
+print(os.getcwd())
 
 
 app = Flask(__name__)
